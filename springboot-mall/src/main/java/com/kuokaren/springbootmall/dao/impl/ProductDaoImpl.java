@@ -23,6 +23,28 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Override
+    public Integer countProduct(ProductQueryParams productQueryParams) {
+        String sql = "SELECT count(*) FROM product WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        if(productQueryParams.getCategory() != null){
+            sql = sql +" AND category = :category";
+            map.put("category",productQueryParams.getCategory().name());    //Enum類別
+        }
+        if(productQueryParams.getSearch() != null){
+            sql = sql +" AND product_name LIKE :search";
+            map.put("search","%"+productQueryParams.getSearch()+"%");
+        }
+
+        // 將count返回值轉換成Integer的類型傳回total
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+
+        return total;
+
+    }
+
     public List<Product> getProducts(ProductQueryParams productQueryParams){
         String sql = "SELECT product_id,product_name, category, image_url, price, " +
                 "stock, description, created_date, last_modified_date FROM product WHERE 1=1";
@@ -39,7 +61,14 @@ public class ProductDaoImpl implements ProductDao {
         }
         //有設定defaultValue 所以不用檢查是否為null
         //sql 語句前後要加空白鍵 才是正常執行
+        //排序
+        // 方法只能用拼接方式,不能直接引入:orderBy參數
         sql = sql + " ORDER BY " +productQueryParams.getOrderBy() +" " + productQueryParams.getSort();
+
+        //分頁
+        sql = sql+" LIMIT :limit OFFSET :offset";
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
