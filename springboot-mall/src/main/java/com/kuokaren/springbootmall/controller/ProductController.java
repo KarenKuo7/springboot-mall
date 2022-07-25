@@ -1,6 +1,7 @@
 package com.kuokaren.springbootmall.controller;
 
 
+import com.kuokaren.springbootmall.constant.ProductCategory;
 import com.kuokaren.springbootmall.dto.ProductRequest;
 import com.kuokaren.springbootmall.model.Product;
 import com.kuokaren.springbootmall.service.ProductService;
@@ -19,8 +20,11 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProduct(){
-        List<Product> productList = productService.getProducts();
+    public ResponseEntity<List<Product>> getProduct(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String search
+    ){
+        List<Product> productList = productService.getProducts(category, search);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
 
