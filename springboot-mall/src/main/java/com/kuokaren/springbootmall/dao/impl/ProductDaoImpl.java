@@ -29,14 +29,8 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        if(productQueryParams.getCategory() != null){
-            sql = sql +" AND category = :category";
-            map.put("category",productQueryParams.getCategory().name());    //Enum類別
-        }
-        if(productQueryParams.getSearch() != null){
-            sql = sql +" AND product_name LIKE :search";
-            map.put("search","%"+productQueryParams.getSearch()+"%");
-        }
+        //查詢方法
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         // 將count返回值轉換成Integer的類型傳回total
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
@@ -51,14 +45,9 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        if(productQueryParams.getCategory() != null){
-            sql = sql +" AND category = :category";
-            map.put("category",productQueryParams.getCategory().name());    //Enum類別
-        }
-        if(productQueryParams.getSearch() != null){
-            sql = sql +" AND product_name LIKE :search";
-            map.put("search","%"+productQueryParams.getSearch()+"%");
-        }
+        //查詢條件
+        sql = addFilteringSql(sql, map, productQueryParams);
+
         //有設定defaultValue 所以不用檢查是否為null
         //sql 語句前後要加空白鍵 才是正常執行
         //排序
@@ -156,5 +145,18 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId",productId);
 
         namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    private String addFilteringSql(String sql, Map<String, Object> map, ProductQueryParams productQueryParams){
+
+        if(productQueryParams.getCategory() != null){
+            sql = sql +" AND category = :category";
+            map.put("category",productQueryParams.getCategory().name());    //Enum類別
+        }
+        if(productQueryParams.getSearch() != null){
+            sql = sql +" AND product_name LIKE :search";
+            map.put("search","%"+productQueryParams.getSearch()+"%");
+        }
+        return sql;
     }
 }
