@@ -37,6 +37,9 @@ public class ProductDaoImpl implements ProductDao {
             sql = sql +" AND product_name LIKE :search";
             map.put("search","%"+productQueryParams.getSearch()+"%");
         }
+        //有設定defaultValue 所以不用檢查是否為null
+        //sql 語句前後要加空白鍵 才是正常執行
+        sql = sql + " ORDER BY " +productQueryParams.getOrderBy() +" " + productQueryParams.getSort();
 
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
