@@ -2,6 +2,7 @@ package com.kuokaren.springbootmall.service.impl;
 
 
 import com.kuokaren.springbootmall.dao.UserDao;
+import com.kuokaren.springbootmall.dto.UserLoginRequest;
 import com.kuokaren.springbootmall.dto.UserRegisterRequest;
 import com.kuokaren.springbootmall.model.User;
 import com.kuokaren.springbootmall.service.UserService;
@@ -39,5 +40,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer userId) {
         return userDao.getUserById(userId);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+        if(user ==null){
+            log.warn("該email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        //比較兩個 String 的值，必須用equals
+        if(user.getPassword().equals(userLoginRequest.getPassword())){
+            return user;
+        }else{
+            log.warn("email {} 的密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
