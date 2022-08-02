@@ -4,6 +4,7 @@ import com.kuokaren.springbootmall.dao.OrderDao;
 import com.kuokaren.springbootmall.dao.ProductDao;
 import com.kuokaren.springbootmall.dto.BuyItem;
 import com.kuokaren.springbootmall.dto.CreateOrderRequest;
+import com.kuokaren.springbootmall.model.Order;
 import com.kuokaren.springbootmall.model.OrderItem;
 import com.kuokaren.springbootmall.model.Product;
 import com.kuokaren.springbootmall.service.OrderService;
@@ -23,6 +24,18 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductDao productDao;
 
+    @Override
+    public Order getOrderById(Integer orderId) {
+       Order order = orderDao.getOrderById(orderId);
+
+       List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+
+       order.setOrderItemList(orderItemList);
+
+       return order;
+
+
+    }
 
     @Transactional       // 同時執行兩個資料庫 ，必須兩個 table同時執行or同時失敗
     @Override

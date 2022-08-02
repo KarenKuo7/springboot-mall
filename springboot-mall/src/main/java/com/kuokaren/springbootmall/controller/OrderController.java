@@ -1,6 +1,7 @@
 package com.kuokaren.springbootmall.controller;
 
 import com.kuokaren.springbootmall.dto.CreateOrderRequest;
+import com.kuokaren.springbootmall.model.Order;
 import com.kuokaren.springbootmall.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,13 @@ public class OrderController {
                                          @RequestBody @Valid CreateOrderRequest createOrderRequest
                                          ){
 
+        //插入訂單資訊
         Integer orderId = orderService.createOrder(userId, createOrderRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderId);
+        //回傳整筆訂單數據給前端
+        Order order = orderService.getOrderById(orderId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
 
     }
 }
